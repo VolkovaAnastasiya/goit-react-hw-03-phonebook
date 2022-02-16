@@ -16,23 +16,40 @@ class App extends Component {
     filter: '',
   };
 
+  componentDidMount() {
+    const parsContacts = JSON.parse(localStorage.getItem('contacts'));
+    if (parsContacts) {
+      this.setState({ contacts: parsContacts });
+    }
+  }
+
+  componentDidUpdate(prevState) {
+    const prevContacts = prevState.contacts;
+    const nextContacts = this.state.contacts;
+
+    if (prevContacts !== nextContacts) {
+      localStorage.setItem('contacts', JSON.stringify(nextContacts));
+    }
+  }
+
   addContacts = data => {
     const { contacts } = this.state;
 
-    const names = contacts.map(contact => contact.name.toLowerCase());
+    // const names = contacts.map(contact => contact.name.toLowerCase());
 
-    names.includes(data.name.toLowerCase())
+    // names.includes(data.name.toLowerCase())
+    //   ? alert(`${data.name} is already in contact`)
+    //   : this.setState(prevState => ({
+    //       contacts: [data, ...prevState.contacts],
+    //     }));
+
+    contacts.find(
+      contact => contact.name.toLowerCase() === data.name.toLowerCase()
+    )
       ? alert(`${data.name} is already in contact`)
       : this.setState(prevState => ({
           contacts: [data, ...prevState.contacts],
         }));
-
-
-      //   contacts.find(obj => obj.name.toLowerCase() === data.name.toLowerCase())
-      // ? alert(`${data.name} is already in contact`)
-      // : this.setState(prevState => ({
-      //     contacts: [data, ...prevState.contacts],
-      //   }));
   };
 
   deleteContact = contactId => {
@@ -40,6 +57,7 @@ class App extends Component {
       contacts: prevState.contacts.filter(contact => contact.id !== contactId),
     }));
   };
+
   getVisibleContact = () => {
     const { contacts, filter } = this.state;
     const normalizedfilter = filter.toLowerCase();
@@ -48,6 +66,7 @@ class App extends Component {
       contact.name.toLowerCase().includes(normalizedfilter)
     );
   };
+
   changeFilter = e => {
     this.setState({ filter: e.currentTarget.value });
   };
